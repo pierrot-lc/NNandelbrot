@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 import torch.optim as optim
 
@@ -26,10 +28,8 @@ class NNandelbrotTrainer:
 
         return metrics
 
-    def train(self):
+    def train(self, group: str, config: dict[str, Any], mode: str):
         for x, y in self.dataloader:
             metrics = self.do_batch(x, y)
             metrics["loss"].backward()
             self.optimizer.step()
-
-            print(metrics["loss"])

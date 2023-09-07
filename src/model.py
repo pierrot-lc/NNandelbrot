@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Any
 
 import torch
@@ -39,25 +40,38 @@ class CLayerNorm(nn.LayerNorm):
 
 
 class NNandelbrotModel(nn.Module):
-    def __init__(self, input_dim: int):
+    def __init__(self, hidden_dim: int, n_layers: int):
         super().__init__()
 
-        dtype = torch.cfloat
+        Linear = partial(nn.Linear, dtype=torch.cfloat)
+        LazyLinear = partial(nn.LazyLinear, dtype=torch.cfloat)
 
-        self.mlp = nn.Sequential(
-            nn.Linear(input_dim, 5, dtype=dtype),
+        self.project_input = nn.Sequential(
+            LazyLinear(hidden_dim),
             CReLU(),
-            CLayerNorm(5),
-            nn.Linear(5, 5, dtype=dtype),
-            CReLU(),
-            CLayerNorm(5),
-            nn.Linear(5, 5, dtype=dtype),
-            CReLU(),
-            CLayerNorm(5),
-            nn.Linear(5, 1, dtype=dtype),
+            CLayerNorm(hidden_dim),
         )
 
+        self.residual_layers = nn.ModuleList(
+            [
+                nn.Sequential(
+                    Linear(hidden_dim, hidden_dim),
+                    CReLU(),
+                    CLayerNorm(hidden_dim),
+                )
+                for _ in range(n_layers)
+            ]
+        )
+
+        self.project_output = Linear(hidden_dim, 1)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.mlp(x)
+        x = self.project_input(x)
+
+        for layer in self.residual_layers:
+            x = x + layer(x)
+
+        x = self.project_output(x)
+
         x = x.angle()  # Real value in range [-pi, pi].
         return torch.sigmoid(x)  # Real value in range [0.04, 0.96].
