@@ -1,12 +1,13 @@
 [project]
 name = "NNandelbrot"
-version = ""
+version = "0.9"
 description = "Training a neural network to construct the Mandelbrot set."
 authors = [
     {name = "Pierrot LC", email = "pstmrtem@outlook.com"},
 ]
 dependencies = [
     "torch>=2.0.1",
+    "numpy>=1.25.2",
 ]
 requires-python = ">=3.10"
 readme = "README.md"

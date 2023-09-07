@@ -4,7 +4,7 @@ description:
 authors: pierrot-lc
 categories: 
 created: 2023-09-05
-updated: 2023-09-05
+updated: 2023-09-07
 version: 1.1.1
 @end
 
@@ -13,4 +13,4 @@ version: 1.1.1
   - Sample weight around pixels where the model is unsure about his predictions
   - Sample dynamically points inside the dataloader (infinite datapoints)
   - Add fourier features inside the dataloader
-  - See how the inifite resolution diffusion model works (not pixel space but continuous space)
+  - See how the infinite resolution diffusion model works (not pixel space but continuous space)

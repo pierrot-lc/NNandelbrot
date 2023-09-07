@@ -3,7 +3,7 @@ import torch
 from .constants import DIV_THRESHOLD, X_LIM, Y_LIM
 
 
-class MandelbrotDataloader:
+class NNandelbrotDataloader:
     def __init__(
         self,
         mandelbrot_iterations: int,
@@ -20,7 +20,15 @@ class MandelbrotDataloader:
         self.current_iter = 0
         self.rng = torch.Generator(self.device).manual_seed(seed)
 
-    def generate_batch(self) -> tuple[torch.Tensor, torch.Tensor]:
+    def sample_uniform(self) -> torch.Tensor:
+        """Generate a batch of complex points.
+        They are sampled uniformly over the mandelbrot space.
+
+        ---
+        Returns:
+            The sampled points.
+                Complex tensor of shape [batch_size,].
+        """
         coords = torch.rand(
             (2, self.batch_size),
             generator=self.rng,
@@ -29,15 +37,30 @@ class MandelbrotDataloader:
         )
         coords[0] = X_LIM[0] + (X_LIM[1] - X_LIM[0]) * coords[0]
         coords[1] = Y_LIM[0] + (Y_LIM[1] - Y_LIM[0]) * coords[1]
-        coords = torch.complex(real=coords[0], imag=coords[1])
+        return torch.complex(real=coords[0], imag=coords[1])
 
-        series = torch.zeros_like(coords, dtype=coords.dtype, device=coords.device)
+    def mandelbrot_labels(self, points: torch.Tensor) -> torch.Tensor:
+        """Apply the original Mandelbrot iterations to return the binary label
+        of the given points.
+
+        ---
+        Args:
+            points: Points for which we calculate the labels.
+                Complex tensor of shape [batch_size,].
+
+        ---
+        Returns:
+            The corresponding labels.
+                Boolean tensor of shape [batch_size,].
+        """
+        series = torch.zeros_like(points, dtype=points.dtype, device=points.device)
+
         for _ in range(self.mandelbrot_iterations):
-            series = series.pow(2) + coords
+            series = series.pow(2) + points
 
-        return coords, series.abs() > DIV_THRESHOLD
+        return series.abs() > DIV_THRESHOLD
 
-    def __iter__(self) -> "MandelbrotDataloader":
+    def __iter__(self) -> "NNandelbrotDataloader":
         self.current_iter = 0
         return self
 
@@ -46,4 +69,7 @@ class MandelbrotDataloader:
             raise StopIteration
 
         self.current_iter += 1
-        return self.generate_batch()
+
+        points = self.sample_uniform()
+        labels = self.mandelbrot_labels(points)
+        return points.unsqueeze(-1), labels.float().unsqueeze(-1)
