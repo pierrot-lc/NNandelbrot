@@ -60,6 +60,9 @@ class NNandelbrotDataloader:
 
         return series.abs() > DIV_THRESHOLD
 
+    def __len__(self) -> int:
+        return self.epoch_len
+
     def __iter__(self) -> "NNandelbrotDataloader":
         self.current_iter = 0
         return self

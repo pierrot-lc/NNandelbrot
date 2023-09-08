@@ -1,6 +1,7 @@
 **/__pycache__/
 **/*.egg-info/
 outputs
+wandb
 .pdm-python
 pdm.lock
 .venv

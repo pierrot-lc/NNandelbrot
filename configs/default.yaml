@@ -7,8 +7,8 @@ data:
   mandelbrot_iterations: 100
 
 train:
-  batch_size: 256
-  epoch_len: 100
+  batch_size: 512
+  epoch_len: 1000
   lr: 1.0e-4
 
 group: Test
