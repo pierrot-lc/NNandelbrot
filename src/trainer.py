@@ -17,10 +17,12 @@ class NNandelbrotTrainer:
         model: NNandelbrotModel,
         optimizer: optim.Optimizer,
         dataloader: NNandelbrotDataloader,
+        device: str | torch.device,
     ):
         self.model = model
         self.optimizer = optimizer
         self.dataloader = dataloader
+        self.device = device
 
         self.loss = torch.nn.BCELoss()
 
@@ -33,6 +35,8 @@ class NNandelbrotTrainer:
         return metrics
 
     def train(self, group: str, config: dict[str, Any], mode: str):
+        self.model.to(self.device)
+
         with wandb.init(
             project="NNandelbrot",
             entity="pierrotlc",
@@ -40,7 +44,7 @@ class NNandelbrotTrainer:
             config=config,
             mode=mode,
         ) as run:
-            for _ in tqdm(range(10), desc="Epochs", disable=mode == "disabled"):
+            for _ in tqdm(range(1000), desc="Epochs", disable=mode == "disabled"):
                 for x, y in tqdm(
                     self.dataloader,
                     desc="Batchs",
@@ -56,6 +60,6 @@ class NNandelbrotTrainer:
 
     def evaluate(self) -> dict[str, Any]:
         metrics = dict()
-        image = generate(self.model, width=600, height=400)
+        image = generate(self.model, width=600, height=400, device=self.device)
         metrics["image"] = wandb.Image(image)
         return metrics

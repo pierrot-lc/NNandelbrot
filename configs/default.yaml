@@ -1,15 +1,15 @@
 ---
 model:
-  hidden_dim: 12
+  hidden_dim: 32
   n_layers: 4
 
 data:
   mandelbrot_iterations: 100
 
 train:
-  batch_size: 512
-  epoch_len: 1000
-  lr: 1.0e-4
+  batch_size: 4096
+  epoch_len: 10000
+  lr: 1.0e-3
 
 group: Test
 mode: online

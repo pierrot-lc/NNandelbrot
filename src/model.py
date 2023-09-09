@@ -47,7 +47,7 @@ class NNandelbrotModel(nn.Module):
         LazyLinear = partial(nn.LazyLinear, dtype=torch.cfloat)
 
         self.project_input = nn.Sequential(
-            LazyLinear(hidden_dim),
+            Linear(1, hidden_dim),
             CReLU(),
             CLayerNorm(hidden_dim),
         )

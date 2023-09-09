@@ -10,9 +10,10 @@ def generate(
     height: int,
     x_range: tuple[int, int] = X_LIM,
     y_range: tuple[int, int] = Y_LIM,
+    device: str | torch.device = "cpu",
 ) -> torch.Tensor:
-    x = torch.linspace(x_range[0], x_range[1], width)
-    y = torch.linspace(y_range[0], y_range[1], height)
+    x = torch.linspace(x_range[0], x_range[1], width, device=device)
+    y = torch.linspace(y_range[0], y_range[1], height, device=device)
     points = torch.cartesian_prod(y, x)  # Shape of [height x width, 2].
 
     points = torch.view_as_complex(points)

@@ -25,7 +25,7 @@ def main(config: DictConfig):
         config.seed,
     )
     optimizer = optim.AdamW(model.parameters(), lr=config.train.lr)
-    trainer = NNandelbrotTrainer(model, optimizer, dataloader)
+    trainer = NNandelbrotTrainer(model, optimizer, dataloader, config.device)
 
     trainer.train(config.group, OmegaConf.to_container(config), config.mode)
 
